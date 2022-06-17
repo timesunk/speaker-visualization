@@ -1,1 +1,1 @@
-# speaker-diarization
+# speaker-visualization
