@@ -1,0 +1,10 @@
+write list to txt, check list for correct 
+a or h
+
+
+-> consider writing just frames instead of duration * fps
+
+counter in 'for file, duration' loop to break early (make smaller video for debugging)
+
+duration of exactly 1s?
+

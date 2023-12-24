@@ -1,0 +1,9 @@
+file 'C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\a_h_gs.png'
+duration 2.5
+file 'C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\a_h.png'
+duration 0.5
+file 'C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\a_hgs.png'
+duration 3
+file 'C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\ags_h.png'
+duration 10.5
+file 'C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\ags_h.png'
