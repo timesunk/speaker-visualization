@@ -1,5 +1,4 @@
 import io
-import shutil
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -34,7 +33,7 @@ class Drive:
             credentials = tools.run_flow(flow, store)
         return credentials
 
-    def find_details_id(self,folder: dict) -> str:
+    def find_details_id(self, folder: dict) -> str:
         """
         Returns the id of the details file in the specified folder
         """
@@ -53,7 +52,6 @@ class Drive:
     def find_details(self, ep_num:str) -> str:
         """
         Returns the id of the {ep_num} details file if found
-        ep_num defaults to 'latest'
         """
 
         try:
@@ -65,25 +63,20 @@ class Drive:
                 print(f'No ep# folder in root.')
                 return
             
-            if ep_num == 'latest':
-                latest_ep_folder = sorted(ep_folders, key=lambda a: int(a['name'][2:]), reverse=True)[0]
-                self.folder = latest_ep_folder
-                return self.find_details_id(latest_ep_folder), latest_ep_folder['name'][2:]
-
-            else:
-                for folder in ep_folders:
-                    if folder['name'][2:] == ep_num:
-                        self.folder = folder
-                        return self.find_details_id(folder), ep_num
-                print(f'No ep{ep_num} found in root.')
+            for folder in ep_folders:
+                if folder['name'][2:] == ep_num:
+                    self.folder = folder
+                    return self.find_details_id(folder), ep_num
+            print(f'No ep{ep_num} found in root.')
 
         except HttpError as error:
             print(f'An error occurred: {error}')
     
-    def download_mp3(self):
+    def download_mp3(self) -> str:
         results = self.drive_service.files().list(
                 pageSize=50, fields="nextPageToken, files(id, name)",q=f"'{self.folder['id']}' in parents and name='raw' and mimeType = 'application/vnd.google-apps.folder' and trashed=false").execute()
         raw = results.get('files', [])
+        print(raw)
 
         if not raw:
             print(f"No raw folder in {self.folder['name']}.")
@@ -92,6 +85,7 @@ class Drive:
         results = self.drive_service.files().list(
                 pageSize=50, fields="nextPageToken, files(id, name)",q=f"'{raw[0]['id']}' in parents and name='{self.folder['name']}.mp3' and mimeType != 'application/vnd.google-apps.folder' and trashed=false").execute()
         mp3 = results.get('files', [])
+        print(mp3)
 
         if not mp3:
             print(f"No {self.folder['name']}.mp3 in {raw[0]['name']}")
@@ -121,5 +115,44 @@ class Drive:
 
 if __name__ == '__main__':
     drive = Drive()
-    id = drive.find_details('latest')
+    id = drive.find_details('246')
+    print(id)
     drive.download_mp3()
+
+# from googleapiclient.discovery import build
+# from google_auth_oauthlib.flow import InstalledAppFlow
+# from google.auth.transport.requests import Request
+# import pickle
+# import os
+
+# SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
+
+# creds = None
+# # Load saved credentials if they exist
+# if os.path.exists('token.pickle'):
+#     with open('token.pickle', 'rb') as token:
+#         creds = pickle.load(token)
+
+# # If no valid creds, run OAuth flow
+# if not creds or not creds.valid:
+#     if creds and creds.expired and creds.refresh_token:
+#         creds.refresh(Request())
+#     else:
+#         flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+#         creds = flow.run_local_server(port=0)
+#     # Save credentials for next run
+#     with open('token.pickle', 'wb') as token:
+#         pickle.dump(creds, token)
+
+# service = build('drive', 'v3', credentials=creds)
+
+# # Example: list files in a folder
+# FOLDER_ID = "YOUR_FOLDER_ID"
+# response = service.files().list(
+#     q=f"'{FOLDER_ID}' in parents",
+#     fields="files(id, name, mimeType)",
+#     pageSize=1000
+# ).execute()
+
+# for file in response['files']:
+#     print(f"{file['name']} ({file['id']}) - {file['mimeType']}")
