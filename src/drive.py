@@ -1,11 +1,10 @@
-import io
+import os.path
 
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaIoBaseDownload
-
-from oauth2client import file, client, tools
-
 
 # If modifying these scopes, delete the file token_drive.json.
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
@@ -25,13 +24,24 @@ class Drive:
         Returns:
             Credentials, the obtained credential.
         """
-        store = file.Storage('token_drive.json')
-        credentials = store.get()
 
-        if not credentials or credentials.invalid:
-            flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
-            credentials = tools.run_flow(flow, store)
-        return credentials
+        creds = None
+        if os.path.exists('token_drive.json'):
+            creds = Credentials.from_authorized_user_file('token_drive.json', SCOPES)
+
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    "credentials.json", SCOPES
+                )
+                creds = flow.run_local_server(port=0)
+
+            with open('token_drive.json', "w") as token:
+                token.write(creds.to_json())
+
+        return creds
 
     def find_details_id(self, folder: dict) -> str:
         """
@@ -113,46 +123,29 @@ class Drive:
         
         return f'{self.folder["name"]}.mp3'
 
+    def simple_test(self) -> str: 
+        try:
+            results = (
+                self.drive_service.files()
+                .list(pageSize=10, fields="nextPageToken, files(id, name)")
+                .execute()
+            )
+            items = results.get("files", [])
+
+            if not items:
+                print("No files found.")
+                return
+            
+            print("Files:")
+            for item in items:
+                print(f"{item['name']} ({item['id']})")
+
+        except HttpError as error:
+            print(f'An error occurred: {error}')
+
 if __name__ == '__main__':
     drive = Drive()
-    id = drive.find_details('246')
-    print(id)
-    drive.download_mp3()
-
-# from googleapiclient.discovery import build
-# from google_auth_oauthlib.flow import InstalledAppFlow
-# from google.auth.transport.requests import Request
-# import pickle
-# import os
-
-# SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
-
-# creds = None
-# # Load saved credentials if they exist
-# if os.path.exists('token.pickle'):
-#     with open('token.pickle', 'rb') as token:
-#         creds = pickle.load(token)
-
-# # If no valid creds, run OAuth flow
-# if not creds or not creds.valid:
-#     if creds and creds.expired and creds.refresh_token:
-#         creds.refresh(Request())
-#     else:
-#         flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-#         creds = flow.run_local_server(port=0)
-#     # Save credentials for next run
-#     with open('token.pickle', 'wb') as token:
-#         pickle.dump(creds, token)
-
-# service = build('drive', 'v3', credentials=creds)
-
-# # Example: list files in a folder
-# FOLDER_ID = "YOUR_FOLDER_ID"
-# response = service.files().list(
-#     q=f"'{FOLDER_ID}' in parents",
-#     fields="files(id, name, mimeType)",
-#     pageSize=1000
-# ).execute()
-
-# for file in response['files']:
-#     print(f"{file['name']} ({file['id']}) - {file['mimeType']}")
+    drive.simple_test()
+    # id = drive.find_details('246')
+    # print(id)
+    # drive.download_mp3()
