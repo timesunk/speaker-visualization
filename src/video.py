@@ -4,6 +4,9 @@ import moviepy.editor as mpe
 
 
 def read_labels():
+    """
+    reads labels
+    """
     with open(r"video refs\labels.txt", "r") as fr:
         end = 0
 

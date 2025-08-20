@@ -15,9 +15,15 @@ class MP3:
             self.tags = ID3(v2_version=3)
 
     def print_tags(self):
+        """
+        prints tags
+        """
         print(self.tags.pprint())
 
     def add_tags(self):
+        """
+        adds tags
+        """
         # print(self.metadata['Title'][0],type(self.metadata['Title'][0]))
         self.tags.add(TIT2(text=self.metadata["Title"]))
         self.tags.add(TPE1(text=["Time Sink"]))
@@ -28,10 +34,16 @@ class MP3:
         self.tags.save(self.audio, v2_version=3)
 
     def delete_tags(self):
+        """
+        deletes tags
+        """
         self.tags.delete(self.audio)
         self.tags.save(self.audio, v2_version=3)
 
     def convert_seconds(self, timestamp):
+        """
+        converts seconds
+        """
         full_time = timestamp.split(":")
         if len(full_time) == 2:
             m, s = full_time
@@ -42,6 +54,9 @@ class MP3:
         return s_time * 1000
 
     def add_chapters(self, chapters):
+        """
+        adds chapters
+        """
 
         self.tags.add(
             CTOC(

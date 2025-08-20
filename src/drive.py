@@ -14,7 +14,7 @@ class Drive:
         self.credentials = self.get_credentials()
         self.drive_service = build('drive', 'v3', credentials=self.credentials)
 
-    def get_credentials(self):
+    def get_credentials(self) -> dict:
         """
         Gets valid user credentials from storage.
 
@@ -22,7 +22,7 @@ class Drive:
         the OAuth 2.0 flow is completed to obtain the new credentials.
 
         Returns:
-            Credentials, the obtained credential.
+            Credentials: Credentials, the obtained credential.
         """
 
         creds = None
@@ -123,29 +123,8 @@ class Drive:
         
         return f'{self.folder["name"]}.mp3'
 
-    def simple_test(self) -> str: 
-        try:
-            results = (
-                self.drive_service.files()
-                .list(pageSize=10, fields="nextPageToken, files(id, name)")
-                .execute()
-            )
-            items = results.get("files", [])
-
-            if not items:
-                print("No files found.")
-                return
-            
-            print("Files:")
-            for item in items:
-                print(f"{item['name']} ({item['id']})")
-
-        except HttpError as error:
-            print(f'An error occurred: {error}')
-
 if __name__ == '__main__':
     drive = Drive()
-    drive.simple_test()
-    # id = drive.find_details('246')
-    # print(id)
-    # drive.download_mp3()
+    id = drive.find_details('248')
+    print(id)
+    drive.download_mp3()

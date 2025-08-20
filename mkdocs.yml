@@ -1,0 +1,13 @@
+site_name: Time Sink
+theme:
+  name: material
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["src"]   # where your code lives
+          options:
+            docstring_style: google
+            show_source: true

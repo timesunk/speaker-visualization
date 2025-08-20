@@ -6,6 +6,9 @@ from mp3 import MP3
 
 class TimeSink:
     def __init__(self, ep_num="latest", convert_mp3=True):
+        """
+        sets variables
+        """
         self.ep_num = ep_num
         self.convert_mp3 = convert_mp3
         self.drive = Drive()
@@ -23,6 +26,9 @@ class TimeSink:
         self.details = doc_content
 
     def add_metadata(self, metadata):
+        """
+        Adds metadata to mp3 files
+        """
         mp3_name = self.drive.download_mp3()
         self.mp3 = MP3(metadata, mp3_name)
         self.mp3.delete_tags()
@@ -30,6 +36,9 @@ class TimeSink:
         self.mp3.print_tags()
 
     def runner(self):
+        """
+        begins code execution
+        """
         self.read_details()
         print("details", self.details)
         if self.convert_mp3:
