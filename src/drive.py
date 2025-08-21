@@ -8,13 +8,17 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+import logging
+
 # If modifying these scopes, delete the file token_drive.json.
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
 class Drive:
     def __init__(self):
-        self.credentials = self.get_credentials()
-        self.drive_service = build('drive', 'v3', credentials=self.credentials)
+        '''
+        Creates the `drive_service`, linking to Google Drive
+        '''
+        self.drive_service = build('drive', 'v3', credentials=self.get_credentials())
 
     def get_credentials(self) -> dict:
         """
@@ -45,88 +49,103 @@ class Drive:
 
         return creds
 
-    def find_details_id(self, folder: dict) -> str:
+    def get_ep_details(self, folder: dict) -> dict:
         """
-        Returns the id of the details file in the specified folder
+        Gets `ep#_details` file id and name dictionary 
+
+        Returns:
+            the id of the details file in the specified folder
         """
         results = self.drive_service.files().list(
-            pageSize=5, fields="nextPageToken, files(id, name)",q=f"'{folder['id']}' in parents and trashed=false").execute()
+            pageSize=5, fields="nextPageToken, files(id, name)",q=f"name = '{folder['name']}_details' and '{folder['id']}' in parents and trashed=false").execute()
         items = results.get('files', [])
 
         if not items:
-            print(f'No ep{folder["name"]} folder in root.')
+            print(f'No {folder["name"]} folder in root.')
             return
 
-        for item in items:
-            if item['name'].endswith('details'):
-                return item['id']
+        ep_details = items[0]
+        return ep_details
 
-    def find_details(self, ep_num:str) -> str:
+    def get_ep_folder(self, ep_num: str) -> dict:
         """
-        Returns the id of the {ep_num} details file if found
+        Gets `ep#_folder` folder id and name
+
+        Args:
+            ep_num (str): name of episode folder
+
+        Returns:
+            dict: id and name of ep#_folder.
+
         """
 
         try:
             results = self.drive_service.files().list(
-                pageSize=50, fields="nextPageToken, files(id, name)",q="'root' in parents and name contains 'ep' and mimeType = 'application/vnd.google-apps.folder' and trashed=false").execute()
+                pageSize=5, fields="nextPageToken, files(id, name)",q=f"name = '{ep_num}' and mimeType = 'application/vnd.google-apps.folder' and trashed=false").execute()
             ep_folders = results.get('files', [])
 
             if not ep_folders:
                 print(f'No ep# folder in root.')
                 return
             
-            for folder in ep_folders:
-                if folder['name'][2:] == ep_num:
-                    self.folder = folder
-                    return self.find_details_id(folder), ep_num
-            print(f'No ep{ep_num} found in root.')
-
+            ep_folder = ep_folders[0]
+            return ep_folder
+                
         except HttpError as error:
             print(f'An error occurred: {error}')
     
-    def download_mp3(self) -> str:
+    def download_mp3(self, folder: dict) -> dict:
+        """
+        Downloads the `ep#.mp3` file under `ep_folder/raw/`
+
+        Returns:
+            the id of the {ep_num} folder, if found
+        """
         results = self.drive_service.files().list(
-                pageSize=50, fields="nextPageToken, files(id, name)",q=f"'{self.folder['id']}' in parents and name='raw' and mimeType = 'application/vnd.google-apps.folder' and trashed=false").execute()
+                pageSize=5, fields="nextPageToken, files(id, name)",q=f"'{folder['id']}' in parents and name='raw' and mimeType = 'application/vnd.google-apps.folder' and trashed=false").execute()
         raw = results.get('files', [])
-        print(raw)
 
         if not raw:
             print(f"No raw folder in {self.folder['name']}.")
             return
 
         results = self.drive_service.files().list(
-                pageSize=50, fields="nextPageToken, files(id, name)",q=f"'{raw[0]['id']}' in parents and name='{self.folder['name']}.mp3' and mimeType != 'application/vnd.google-apps.folder' and trashed=false").execute()
-        mp3 = results.get('files', [])
-        print(mp3)
+                pageSize=5, fields="nextPageToken, files(id, name)",q=f"'{raw[0]['id']}' in parents and name='{folder['name']}.mp3' and mimeType != 'application/vnd.google-apps.folder' and trashed=false").execute()
+        mp3s = results.get('files', [])
 
-        if not mp3:
-            print(f"No {self.folder['name']}.mp3 in {raw[0]['name']}")
+        if not mp3s:
+            print(f"No {folder['name']}.mp3 in {raw[0]['name']}")
             return
         
-        print(mp3)
-
+        mp3 = mp3s[0]
+        
         try:
-            file_id = mp3[0]['id']
+            file_id = mp3['id']
 
             request = self.drive_service.files().get_media(fileId=file_id)
             file = io.BytesIO()
             downloader = MediaIoBaseDownload(file, request)
+
             done = False
             while done is False:
                 status, done = downloader.next_chunk()
-                print(f'Download {int(status.progress() * 100)}.')
+                print(f'Download {int(status.progress() * 100)}%')
 
         except HttpError as error:
             print(f'An error occurred: {error}')
             file = None
 
-        with open(f'{self.folder["name"]}.mp3','wb') as f:
+        with open(f'{mp3['name']}','wb') as f:
             f.write(file.getbuffer())
         
-        return f'{self.folder["name"]}.mp3'
+        return mp3
 
 if __name__ == '__main__':
     drive = Drive()
-    id = drive.find_details('248')
-    print(id)
-    drive.download_mp3()
+    folder = drive.get_ep_folder('ep248')
+    print(f'{folder=}')
+    details = drive.get_ep_details(folder)
+    print(f'{details=}')
+    mp3 = drive.download_mp3(folder)
+    print(f'{mp3=}')
+
