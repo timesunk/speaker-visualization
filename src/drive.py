@@ -10,9 +10,6 @@ from googleapiclient.errors import HttpError
 
 import logging
 
-# If modifying these scopes, delete the file token_drive.json.
-SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
-
 class Drive:
     def __init__(self):
         '''
@@ -30,6 +27,9 @@ class Drive:
         Returns:
             Credentials: Credentials, the obtained credential.
         """
+
+        # If modifying these scopes, delete the file token_drive.json.
+        SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
         creds = None
         if os.path.exists('token_drive.json'):
@@ -49,9 +49,12 @@ class Drive:
 
         return creds
 
-    def get_ep_details(self, folder: dict) -> dict:
+    def get_ep_details_id(self, folder: dict) -> dict:
         """
         Gets `ep#_details` file id and name dictionary 
+
+        Args:
+            folder (dict): name and id of episode folder
 
         Returns:
             the id of the details file in the specified folder
@@ -67,7 +70,7 @@ class Drive:
         ep_details = items[0]
         return ep_details
 
-    def get_ep_folder(self, ep_num: str) -> dict:
+    def get_ep_folder_id(self, ep_num: str) -> dict:
         """
         Gets `ep#_folder` folder id and name
 
@@ -97,6 +100,9 @@ class Drive:
     def download_mp3(self, folder: dict) -> dict:
         """
         Downloads the `ep#.mp3` file under `ep_folder/raw/`
+
+        Args:
+            folder (dict): name and id of episode folder
 
         Returns:
             the id of the {ep_num} folder, if found
@@ -142,9 +148,9 @@ class Drive:
 
 if __name__ == '__main__':
     drive = Drive()
-    folder = drive.get_ep_folder('ep248')
+    folder = drive.get_ep_folder_id('ep248')
     print(f'{folder=}')
-    details = drive.get_ep_details(folder)
+    details = drive.get_ep_details_id(folder)
     print(f'{details=}')
     mp3 = drive.download_mp3(folder)
     print(f'{mp3=}')

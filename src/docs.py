@@ -1,5 +1,6 @@
 from collections import defaultdict
 from typing import Dict
+from pprint import pprint
 
 import os.path
 
@@ -9,13 +10,15 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-SCOPES = ["https://www.googleapis.com/auth/documents.readonly"]
 
 class Docs:
     def __init__(self):
+        '''
+        Creates the `docs_service`, to read all Google Docs
+        '''
         self.docs_service  = build("docs", "v1", credentials=self.get_credentials())
 
-    def get_credentials(self):
+    def get_credentials(self) -> dict:
         """
         Gets valid user credentials from storage.
 
@@ -23,8 +26,12 @@ class Docs:
         the OAuth 2.0 flow is completed to obtain the new credentials.
 
         Returns:
-            Credentials, the obtained credential.
+            Credentials: Credentials, the obtained credential.
         """
+
+        # If modifying these scopes, delete the file token_drive.json.
+        SCOPES = ["https://www.googleapis.com/auth/documents.readonly"]
+
         creds = None
         if os.path.exists("token_docs.json"):
             creds = Credentials.from_authorized_user_file("token_docs.json", SCOPES)
@@ -43,18 +50,34 @@ class Docs:
 
         return creds
 
-        # try:
-        #     service = build("docs", "v1", credentials=creds)
+    def get_doc(self, id: str) -> dict:
+        """
+        Gets the full document with the specified id
 
-    def get_doc(self,id):
+        Args:
+            id (str): id of document
+
+        Returns:
+            doc: full document
+
         """
-        Returns the document with the specified id
-        """
-        return self.docs_service.documents().get(documentId=id).execute()
+        try:
+            doc = self.docs_service.documents().get(documentId=id).execute()
+
+        except HttpError as err:
+            print(err)
+
+        return doc
 
     def read_details(self, id: str) -> Dict[str , list[str]]:
         """
         Reads ep#_details document and returns dictionary of relevant values
+
+        Args:
+            id (str): id of document
+
+        Returns:
+            d: dictionary of all the details from the table in ep#_details.docx file
         """
         doc = self.get_doc(id)
 
@@ -85,4 +108,4 @@ class Docs:
 if __name__ == "__main__":
     docs = Docs()
     doc_content = docs.read_details('1IYtVUONoDgRq5dDqDcSFknMyQEmy3kZRbwqDnw9vItU')
-    print(doc_content)
+    pprint(doc_content)
