@@ -1,32 +1,19 @@
-# Copyright 2019 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# Changed
-
 from collections import defaultdict
 from typing import Dict
 
-from googleapiclient.discovery import build
-from httplib2 import Http
-from oauth2client import file, client, tools
+import os.path
 
-DISCOVERY_DOC = "https://docs.googleapis.com/$discovery/rest?version=v1"
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
 SCOPES = ["https://www.googleapis.com/auth/documents.readonly"]
 
 class Docs:
     def __init__(self):
-        self.credentials = self.get_credentials()
-        self.docs_service = build("docs", "v1", http=self.credentials.authorize(Http()), discoveryServiceUrl=DISCOVERY_DOC)
+        self.docs_service  = build("docs", "v1", credentials=self.get_credentials())
 
     def get_credentials(self):
         """
@@ -38,14 +25,26 @@ class Docs:
         Returns:
             Credentials, the obtained credential.
         """
-        store = file.Storage("token_docs.json")
-        credentials = store.get()
+        creds = None
+        if os.path.exists("token_docs.json"):
+            creds = Credentials.from_authorized_user_file("token_docs.json", SCOPES)
 
-        if not credentials or credentials.invalid:
-            flow = client.flow_from_clientsecrets("credentials.json", SCOPES)
-            credentials = tools.run_flow(flow, store)
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                "credentials.json", SCOPES
+                )
+                creds = flow.run_local_server(port=0)
 
-        return credentials
+            with open("token_docs.json", "w") as token:
+                token.write(creds.to_json())
+
+        return creds
+
+        # try:
+        #     service = build("docs", "v1", credentials=creds)
 
     def get_doc(self,id):
         """
@@ -85,5 +84,5 @@ class Docs:
 
 if __name__ == "__main__":
     docs = Docs()
-    doc_content = docs.read_details('1eZy4PhMN22iiVA4Kcf5W7GZoyrL4umBxtoMQpWB6LCU')
+    doc_content = docs.read_details('1IYtVUONoDgRq5dDqDcSFknMyQEmy3kZRbwqDnw9vItU')
     print(doc_content)
