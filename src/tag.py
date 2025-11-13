@@ -3,7 +3,7 @@ from mutagen.id3 import ID3, CTOC, CHAP, TIT2, CTOCFlags, ID3NoHeaderError, TPE1
 from mutagen.mp3 import MP3 as MUT_MP3
 
 
-class MP3:
+class Tag:
     def __init__(self, metadata, audio):
         self.metadata = metadata
         self.audio = audio
@@ -162,4 +162,4 @@ class MP3:
 
 # use eyd3
 if __name__ == "__main__":
-    mp3 = MP3()
+    tags = Tag()

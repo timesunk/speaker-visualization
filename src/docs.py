@@ -9,7 +9,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
+from google.auth.exceptions import RefreshError
 
 class Docs:
     def __init__(self):
@@ -36,14 +36,18 @@ class Docs:
         if os.path.exists("token_docs.json"):
             creds = Credentials.from_authorized_user_file("token_docs.json", SCOPES)
 
-        if not creds or not creds.valid:
+        try:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
-                )
-                creds = flow.run_local_server(port=0)
+        except RefreshError:
+            print("Refresh token invalid, regenerating...")
+            creds = None
+
+        if not creds or not creds.valid:
+            flow = InstalledAppFlow.from_client_secrets_file(
+            "credentials.json", SCOPES
+            )
+            creds = flow.run_local_server(port=0)
 
             with open("token_docs.json", "w") as token:
                 token.write(creds.to_json())
@@ -81,7 +85,9 @@ class Docs:
         """
         doc = self.get_doc(id)
 
+
         elements = doc["body"]["content"]
+        pprint(elements)
         d = defaultdict(list)
         for value in elements:
             if "table" in value:
@@ -90,16 +96,20 @@ class Docs:
                     left_col, right_col = row["tableCells"]
                     k = left_col['content'][0]['paragraph']['elements'][0]['textRun']['content'].strip()
 
-                    if k == 'Categories': continue
+                    if k == 'Categories': continue # ignore
 
+                    # only take the first title
                     elif k == 'Title':
                         d[k].append(right_col['content'][0]['paragraph']['elements'][0]['textRun']['content'].strip())
 
+                    # process each link, to add a dictionary with text and url
                     elif k == 'Shownotes':
                         for c in right_col['content']:
                             base = c['paragraph']['elements'][0]['textRun']
                             text, url = base['content'].strip(), base['textStyle'].get('link',{}).get('url','') # safer
                             d[k].append({'text':text, 'url':url})
+
+                    # the rest of the rows are simple key : value
                     else:
                         for c in right_col['content']:
                             d[k].append(c['paragraph']['elements'][0]['textRun']['content'].strip())
@@ -107,5 +117,5 @@ class Docs:
 
 if __name__ == "__main__":
     docs = Docs()
-    doc_content = docs.read_details('1IYtVUONoDgRq5dDqDcSFknMyQEmy3kZRbwqDnw9vItU')
+    doc_content = docs.read_details('1xH6Q6OccbMn5N8SuXtyxlDWrl_uO3AQ9-74DA0-5l2w')
     pprint(doc_content)

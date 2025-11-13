@@ -1,7 +1,7 @@
 from pprint import pprint
 from drive import Drive
 from docs import Docs
-from mp3 import MP3
+from tag import Tag
 
 
 class TimeSink:
@@ -30,7 +30,7 @@ class TimeSink:
         Adds metadata to mp3 files
         """
         mp3_name = self.drive.download_mp3()
-        self.mp3 = MP3(metadata, mp3_name)
+        self.mp3 = Tag(metadata, mp3_name)
         self.mp3.delete_tags()
         self.mp3.add_tags()
         self.mp3.print_tags()
