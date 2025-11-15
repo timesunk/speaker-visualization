@@ -11,5 +11,7 @@ dependencies = [
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.6.17",
     "mkdocstrings[python]>=0.30.0",
+    "moviepy>=2.2.1",
     "mutagen>=1.47.0",
+    "numpy>=2.3.4",
 ]
