@@ -4,9 +4,9 @@ from moviepy import *
 # =========================
 # 1. File paths
 # =========================
-person1_image = r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\base\a_profile.png"
-person2_image = r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\base\h_profile.png"
-audio_file = r"C:\Users\GH3E\Downloads\ep251.mp3"
+person1_image = r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\base\a_profile.png"
+person2_image = r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\base\h_profile.png"
+audio_file = r"C:\Users\Hamza\Desktop\podcast\edit\ep251\ep251.mp3"
 
 # =========================
 # 2. Timestamps (start, end, line_id)
@@ -27,12 +27,12 @@ audio_file = r"C:\Users\GH3E\Downloads\ep251.mp3"
 person1_timestamps = []
 person2_timestamps = []
 
-with open(r"C:\Users\GH3E\Downloads\a.txt", 'r') as f:
+with open(r"C:\Users\Hamza\Desktop\podcast\edit\ep251\a.txt", 'r') as f:
     for line in f:
         tokens = line.split()
         person1_timestamps.append((float(tokens[0]), float(tokens[1])))
 
-with open(r"C:\Users\GH3E\Downloads\h.txt", 'r') as f:
+with open(r"C:\Users\Hamza\Desktop\podcast\edit\ep251\h.txt", 'r') as f:
     for line in f:
         tokens = line.split()
         person2_timestamps.append((float(tokens[0]), float(tokens[1])))
@@ -80,7 +80,7 @@ elif platform == "youtube":
     video_size = (1920, 1080)  # landscape
     clip_height = int(video_size[1] * 0.8)  # 80% height
     clip1 = clip1.resized(height=clip_height).with_position(("left", "center"))
-    clip2 = clip2.resized(height=clip_height).rotated(5).with_position(("right", "center"))
+    clip2 = clip2.resized(height=clip_height).with_position(("right", "center"))
 
 # =========================
 # 7. Combine clips and add audio
