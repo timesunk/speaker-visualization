@@ -4,19 +4,19 @@ from moviepy import *
 # =========================
 # 1. File paths
 # =========================
-person1_image = r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\base\a_profile.png"
-person2_image = r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\base\h_profile.png"
-audio_file = r"C:\Users\Hamza\Desktop\podcast\edit\ep251\ep251.mp3"
+# person1_image = r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\base\a_profile.png"
+# person2_image = r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\base\h_profile.png"
+audio_file = r"C:\Users\GH3E\Downloads\ep251.mp3"
 
 person1_timestamps = []
 person2_timestamps = []
 
-with open(r"C:\Users\Hamza\Desktop\podcast\edit\ep251\a.txt", 'r') as f:
+with open(r"C:\Users\GH3E\Downloads\a.txt", 'r') as f:
     for line in f:
         tokens = line.split()
         person1_timestamps.append((float(tokens[0]), float(tokens[1])))
 
-with open(r"C:\Users\Hamza\Desktop\podcast\edit\ep251\h.txt", 'r') as f:
+with open(r"C:\Users\GH3E\Downloads\h.txt", 'r') as f:
     for line in f:
         tokens = line.split()
         person2_timestamps.append((float(tokens[0]), float(tokens[1])))
@@ -32,15 +32,28 @@ video_duration = audio_clip.duration
 
 # =========================
 # 4. Function to create speaking clip (grayscale when silent)
-def get_person_clip(image_path, speaking_times, video_duration):
-    img = ImageClip(image_path)
+def get_person_clip(a_speaking, h_speaking, video_duration):
+    a_gs_h_gs = ImageClip(r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\a_gs_h_gs.png")
+    a_h = ImageClip(r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\a_h.png")
+    a_hgs = ImageClip(r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\a_hgs.png")
+    ags_h = ImageClip(r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\ags_h.png")
     
     def make_frame(t):
-        is_speaking = any(start <= t < end for (start, end) in speaking_times)
-        frame = img.get_frame(0)
-        if not is_speaking:
-            gray = frame @ [0.299, 0.587, 0.114]
-            frame = np.stack([gray]*3, axis=2)
+        a_is_speaking = any(start <= t < end for (start, end) in a_speaking)
+        h_is_speaking = any(start <= t < end for (start, end) in h_speaking)
+
+        if a_is_speaking and h_is_speaking:
+            frame = a_h.get_frame(0)
+
+        elif a_is_speaking and not h_is_speaking:   
+            frame = a_hgs.get_frame(0)
+
+        elif not a_is_speaking and h_is_speaking:
+            frame = ags_h.get_frame(0)
+
+        else:
+            frame = a_gs_h_gs.get_frame(0)
+
         return frame
     
     return VideoClip(make_frame, duration=video_duration)
@@ -48,7 +61,7 @@ def get_person_clip(image_path, speaking_times, video_duration):
 # =========================
 # 5. Create clips
 print('starting clip1')
-clip1 = get_person_clip(person1_image, person1_timestamps, video_duration)
+clip1 = get_person_clip(person1_timestamps, person2_timestamps, video_duration)
 
 # print('starting clip2')
 # clip2 = get_person_clip(person2_image, person2_timestamps, video_duration)
