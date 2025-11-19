@@ -67,13 +67,19 @@ for t0, t1 in zip(times, times[1:]):
 # --------------------------
 # 4. Merge consecutive intervals with the same image
 # --------------------------
-merged_intervals = []
-for img, dur in intervals:
-    if merged_intervals and merged_intervals[-1][0] == img:
-        merged_intervals[-1] = (img, merged_intervals[-1][1] + dur)
-    else:
-        merged_intervals.append((img, dur))
+# merged_intervals = []
+# for img, dur in intervals:
+#     if merged_intervals and merged_intervals[-1][0] == img:
+#         merged_intervals[-1] = (img, merged_intervals[-1][1] + dur)
+#     else:
+#         merged_intervals.append((img, dur))
 
+# # 5. Ensure video starts at t=0
+# first_interval_start = times[0]
+# if first_interval_start > 0:
+#     merged_intervals = [(image_paths["none"], first_interval_start)] + merged_intervals
+
+merged_intervals = intervals
 # --------------------------
 # 5. Create FFmpeg concat text file
 # --------------------------
