@@ -71,6 +71,7 @@ def get_person_clip(a_speaking, h_speaking, video_duration):
     # Concatenate segments
     return concatenate_videoclips(clips, method="chain")
 
+
 # =========================
 # 5. Create clips
 print('starting clip1')
