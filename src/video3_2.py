@@ -33,30 +33,43 @@ video_duration = audio_clip.duration
 # =========================
 # 4. Function to create speaking clip (grayscale when silent)
 def get_person_clip(a_speaking, h_speaking, video_duration):
+    # Load static image clips once
     a_gs_h_gs = ImageClip(r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\a_gs_h_gs-1920x1080.png")
-    a_h = ImageClip(r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\a_h-1920x1080.png")
-    a_hgs = ImageClip(r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\a_hgs-1920x1080.png")
-    ags_h = ImageClip(r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\ags_h-1920x1080.png")
-    
-    def make_frame(t):
-        a_is_speaking = any(start <= t < end for (start, end) in a_speaking)
-        h_is_speaking = any(start <= t < end for (start, end) in h_speaking)
+    a_h       = ImageClip(r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\a_h-1920x1080.png")
+    a_hgs     = ImageClip(r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\a_hgs-1920x1080.png")
+    ags_h     = ImageClip(r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\ags_h-1920x1080.png")
 
-        if a_is_speaking and h_is_speaking:
-            frame = a_h.get_frame(0)
+    # Build a sorted list of all time boundaries
+    boundaries = {0, video_duration}
+    for start, end in a_speaking + h_speaking:
+        boundaries.add(start)
+        boundaries.add(end)
 
-        elif a_is_speaking and not h_is_speaking:   
-            frame = a_hgs.get_frame(0)
+    boundaries = sorted(boundaries)
 
-        elif not a_is_speaking and h_is_speaking:
-            frame = ags_h.get_frame(0)
+    clips = []
 
+    # Build clip segments
+    for t0, t1 in zip(boundaries, boundaries[1:]):
+        if t1 <= t0:
+            continue
+
+        a_on = any(s <= t0 < e for (s, e) in a_speaking)
+        h_on = any(s <= t0 < e for (s, e) in h_speaking)
+
+        if a_on and h_on:
+            img = a_h
+        elif a_on:
+            img = a_hgs
+        elif h_on:
+            img = ags_h
         else:
-            frame = a_gs_h_gs.get_frame(0)
+            img = a_gs_h_gs
 
-        return frame
-    
-    return VideoClip(make_frame, duration=video_duration)
+        clips.append(img.with_duration(t1 - t0))
+
+    # Concatenate segments
+    return concatenate_videoclips(clips, method="chain")
 
 # =========================
 # 5. Create clips
@@ -70,16 +83,16 @@ clip1 = get_person_clip(person1_timestamps, person2_timestamps, video_duration)
 # 6. Choose platform and resize/position
 platform = "youtube"  # options: "tiktok" or "youtube"
 
-if platform == "tiktok":
-    video_size = (1080, 1920)  # portrait
-    clip_width = int(video_size[0] / 2 * 0.9)  # 90% width for padding
-    clip1 = clip1.resized(width=clip_width).with_position(("left", "center"))
-    # clip2 = clip2.resize(width=clip_width).rotate(-5).set_position(("right", "center"))
+# if platform == "tiktok":
+#     video_size = (1080, 1920)  # portrait
+#     clip_width = int(video_size[0] / 2 * 0.9)  # 90% width for padding
+#     clip1 = clip1.resized(width=clip_width).with_position(("left", "center"))
+#     # clip2 = clip2.resize(width=clip_width).rotate(-5).set_position(("right", "center"))
 
-elif platform == "youtube":
-    video_size = (1920, 1080)  # landscape
-    clip_height = int(video_size[1] * 0.8)  # 80% height
-    clip1 = clip1.resized(height=clip_height).with_position(("left", "center"))
+# elif platform == "youtube":
+#     video_size = (1920, 1080)  # landscape
+#     clip_height = int(video_size[1] * 0.8)  # 80% height
+#     clip1 = clip1.resized(height=clip_height).with_position(("left", "center"))
     # clip2 = clip2.resized(height=clip_height).with_position(("right", "center"))
 
 # =========================
@@ -97,11 +110,14 @@ final_clip = final_clip.with_audio(audio_clip)
 # =========================
 # 8. Export video
 print('exporting...')
+
 final_clip.write_videofile(
     f"conversation_{platform}.mp4",
-    fps=24,
     codec="libx264",
+    preset="ultrafast",
+    ffmpeg_params=["-tune", "stillimage"],
+    fps=24,
     audio_codec="aac",
-    preset="fast",
-    threads=8,
+    audio_bitrate="192k"
 )
+
