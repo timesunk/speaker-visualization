@@ -4,31 +4,29 @@ from pathlib import Path
 from moviepy import AudioFileClip
 
 # --- Paths ---
-audio_path = r"C:\Users\GH3E\Downloads\ep251.mp3"
-output_path = r"C:\Users\GH3E\Downloads\output_fast.mp4"
-tmp_dir = Path(r"C:\Users\GH3E\Downloads\tmp_ffmpeg")  # temporary folder for intermediate files
+audio_path = r"C:\Users\Hamza\Desktop\podcast\edit\ep251\ep251.mp3"
+output_path = r"C:\Users\Hamza\Desktop\podcast\edit\ep251\ep251.mp4"
+tmp_dir = Path(r"C:\Users\Hamza\Desktop\podcast\edit\ep251\tmp_ffmpeg")  # temporary folder for intermediate files
 tmp_dir.mkdir(exist_ok=True)
-
-ffmpeg_exe = r"C:\Users\GH3E\Downloads\ffmpeg-local\ffmpeg-local\bin\ffmpeg.exe"
 
 a_speaking = []
 h_speaking = []
 
-with open(r"C:\Users\GH3E\Downloads\a.txt", 'r') as f:
+with open(r"C:\Users\Hamza\Desktop\podcast\edit\ep251\a.txt", 'r') as f:
     for line in f:
         tokens = line.split()
         a_speaking.append((float(tokens[0]), float(tokens[1])))
 
-with open(r"C:\Users\GH3E\Downloads\h.txt", 'r') as f:
+with open(r"C:\Users\Hamza\Desktop\podcast\edit\ep251\h.txt", 'r') as f:
     for line in f:
         tokens = line.split()
         h_speaking.append((float(tokens[0]), float(tokens[1])))
 
 image_paths = {
-    "both": r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\a_h-1920x1080.png",
-    "a_only": r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\a_hgs-1920x1080.png",
-    "h_only": r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\ags_h-1920x1080.png",
-    "none": r"C:\Users\GH3E\Documents\p\speaker-visualization\video refs\a_gs_h_gs-1920x1080.png"
+    "both": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\a_h-1920x1080.png",
+    "a_only": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\a_hgs-1920x1080.png",
+    "h_only": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\ags_h-1920x1080.png",
+    "none": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\a_gs_h_gs-1920x1080.png"
 }
 
 # --------------------------
@@ -40,6 +38,7 @@ for start, end in a_speaking + h_speaking:
 # add audio duration
 audio_clip = AudioFileClip(audio_path)
 audio_duration  = audio_clip.duration
+print(audio_duration)
 
 times = sorted(all_times)
 
@@ -97,7 +96,7 @@ with open(concat_file, "w") as f:
 # 6. Run FFmpeg to create fully playable MP4
 # --------------------------
 ffmpeg_cmd = [
-    ffmpeg_exe, "-y",
+    "ffmpeg", "-y",
     "-f", "concat",
     "-safe", "0",
     "-i", str(concat_file),
@@ -108,7 +107,7 @@ ffmpeg_cmd = [
     "-pix_fmt", "yuv420p",       # ensures MP4 is playable on all devices
     "-c:a", "aac",
     "-b:a", "192k",
-    "-shortest",
+    "-to", str(audio_duration),
     str(output_path)
 ]
 

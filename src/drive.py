@@ -148,7 +148,7 @@ class Drive:
 
 if __name__ == '__main__':
     drive = Drive()
-    folder = drive.get_ep_folder_id('ep251')
+    folder = drive.get_ep_folder_id('S1E0')
     print(f'{folder=}')
     details = drive.get_ep_details_id(folder)
     print(f'{details=}')

@@ -162,4 +162,23 @@ class Tag:
 
 # use eyd3
 if __name__ == "__main__":
-    tags = Tag()
+    from drive import Drive
+    from docs import Docs
+
+    drive = Drive()
+    folder = drive.get_ep_folder_id('S1E0')
+    print(f'{folder=}')
+    details = drive.get_ep_details_id(folder)
+    print(f'{details=}')
+    mp3 = drive.download_mp3(folder)
+    print(f'{mp3=}')
+
+    docs = Docs()
+    doc_content = docs.read_details(details['id'])
+    doc_content["Track"] = [folder['name']]
+    pprint(doc_content)
+
+    mp3 = Tag(doc_content, mp3['name'])
+    mp3.delete_tags()
+    mp3.add_tags()
+    mp3.print_tags()
