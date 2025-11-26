@@ -1,5 +1,5 @@
 from pprint import pprint
-from mutagen.id3 import ID3, CTOC, CHAP, TIT2, CTOCFlags, ID3NoHeaderError, TPE1, TRCK
+from mutagen.id3 import ID3, CTOC, CHAP, TIT2, CTOCFlags, ID3NoHeaderError, TPE1, TRCK, APIC
 from mutagen.mp3 import MP3 as MUT_MP3
 
 
@@ -29,9 +29,30 @@ class Tag:
         self.tags.add(TPE1(text=["Time Sink"]))
         self.tags.add(TRCK(text=self.metadata["Track"]))
         self.add_chapters(self.metadata["Chapters"])  # what if no chapters
+        self.add_cover_art(self.metadata["Title"])
+        
         pprint(self.tags)
 
         self.tags.save(self.audio, v2_version=3)
+
+
+    def add_cover_art(self, title):
+        """
+        adds cover art
+        """
+
+        if title.contains("(Movie Plug)"):
+
+            with open(r"images\covart - movie_plug.jpg", "rb") as covart:
+                self.tags.add(
+                    APIC(
+                        encoding=3,        # 3 = UTF-8
+                        mime="image/jpeg", # or "image/png"
+                        type=3,            # 3 = front cover
+                        desc="Cover",
+                        data=covart.read()
+                    )
+            )
 
     def delete_tags(self):
         """
@@ -166,7 +187,7 @@ if __name__ == "__main__":
     from docs import Docs
 
     drive = Drive()
-    folder = drive.get_ep_folder_id('S1E0')
+    folder = drive.get_ep_folder_id('S1E1')
     print(f'{folder=}')
     details = drive.get_ep_details_id(folder)
     print(f'{details=}')
