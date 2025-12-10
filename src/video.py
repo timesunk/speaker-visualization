@@ -4,27 +4,27 @@ from pathlib import Path
 from moviepy import AudioFileClip
 
 # --- Paths ---
-audio_path = r"C:\Users\Hamza\Desktop\podcast\edit\ep251\ep251.mp3"
-output_path = r"C:\Users\Hamza\Desktop\podcast\edit\ep251\ep251.mp4"
+audio_path = r"C:\Users\Hamza\Desktop\podcast\edit\S1E2\S1E2.mp3"
+output_path = r"C:\Users\Hamza\Desktop\podcast\edit\S1E2\S1E2.mp4"
 
 a_speaking = []
 h_speaking = []
 
-with open(r"C:\Users\Hamza\Desktop\podcast\edit\ep251\a.txt", 'r') as f:
+with open(r"C:\Users\Hamza\Desktop\podcast\edit\S1E2\a.txt", 'r') as f:
     for line in f:
         tokens = line.split()
         a_speaking.append((float(tokens[0]), float(tokens[1])))
 
-with open(r"C:\Users\Hamza\Desktop\podcast\edit\ep251\h.txt", 'r') as f:
+with open(r"C:\Users\Hamza\Desktop\podcast\edit\S1E2\h.txt", 'r') as f:
     for line in f:
         tokens = line.split()
         h_speaking.append((float(tokens[0]), float(tokens[1])))
 
 image_paths = {
-    "both": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\a_h-1920x1080.png",
-    "a_only": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\a_hgs-1920x1080.png",
-    "h_only": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\ags_h-1920x1080.png",
-    "none": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\video refs\a_gs_h_gs-1920x1080.png"
+    "both": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\assets\merged\a line\both.png",
+    "a_only": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\assets\merged\a line\a.png",
+    "h_only": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\assets\merged\a line\h.png",
+    "none": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\assets\merged\a line\none.png"
 }
 
 audio_clip = AudioFileClip(audio_path)
@@ -45,38 +45,38 @@ hi = 0
 a_len = len(a_speaking)
 h_len = len(h_speaking)
 
-with open('debug.txt','w') as fw:
+# with open('debug.txt','w') as fw:
 
-    for t0, t1 in zip(times, times[1:]):
+for t0, t1 in zip(times, times[1:]):
 
-        fw.write(f'\n\n----------------- {t0} - {t1} -------------------------\n')
-        fw.write(f' a: {a_speaking[ai]} - h: {h_speaking[hi]} \n')
+    # fw.write(f'\n\n----------------- {t0} - {t1} -------------------------\n')
+    # fw.write(f' a: {a_speaking[ai]} - h: {h_speaking[hi]} \n')
 
-        while ai < a_len and a_speaking[ai][1] == t0:
-            ai += 1
-            fw.write(f' ai: {ai}\n')
-
-
-        while hi < h_len and h_speaking[hi][1] == t0:
-            hi += 1
-            fw.write(f' hi: {hi}\n')
+    while ai < a_len and a_speaking[ai][1] == t0:
+        ai += 1
+        # fw.write(f' ai: {ai}\n')
 
 
-        a_on = (ai < a_len and a_speaking[ai][0] == t0)
-        h_on = (hi < h_len and h_speaking[hi][0] == t0)
+    while hi < h_len and h_speaking[hi][1] == t0:
+        hi += 1
+        # fw.write(f' hi: {hi}\n')
 
-        fw.write(f' a_on: {a_on} | h_on: {h_on}\n')
 
-        if a_on and h_on:
-            img = image_paths["both"]
-        elif a_on:
-            img = image_paths["a_only"]
-        elif h_on:
-            img = image_paths["h_only"]
-        else:
-            img = image_paths["none"]
+    a_on = (ai < a_len and a_speaking[ai][0] == t0)
+    h_on = (hi < h_len and h_speaking[hi][0] == t0)
 
-        intervals.append((img, t1 - t0))
+    # fw.write(f' a_on: {a_on} | h_on: {h_on}\n')
+
+    if a_on and h_on:
+        img = image_paths["both"]
+    elif a_on:
+        img = image_paths["a_only"]
+    elif h_on:
+        img = image_paths["h_only"]
+    else:
+        img = image_paths["none"]
+
+    intervals.append((img, t1 - t0))
 
 
 concat_file = "concat_list.txt"

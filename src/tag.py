@@ -41,7 +41,7 @@ class Tag:
         adds cover art
         """
 
-        if title.contains("(Movie Plug)"):
+        if "(Movie Plug)" in title[0]:
 
             with open(r"images\covart - movie_plug.jpg", "rb") as covart:
                 self.tags.add(
@@ -112,74 +112,6 @@ class Tag:
                 )
             )
 
-    # def add_chapters(self, chapters):
-
-    #     self.tags.add(
-    #         CTOC(
-    #             element_id="toc",
-    #             flags=CTOCFlags.TOP_LEVEL | CTOCFlags.ORDERED,
-    #             child_element_ids=["chp1","chp2","chp3","chp4","chp5","chp6"],
-    #             sub_frames=[
-    #                 TIT2(text=["I'm a TOC"]),
-    #             ],
-    #         )
-    #     )
-
-    #     self.tags.add(
-    #         CHAP(
-    #             element_id="chp1",
-    #             start_time=0, end_time=11000,
-    #             sub_frames=[
-    #                 TIT2(text=["Intro"]),
-    #             ],
-    #         )
-    #     )
-    #     self.tags.add(
-    #         CHAP(
-    #             element_id="chp2",
-    #             start_time=11000, end_time=1156000,
-    #             sub_frames=[
-    #                 TIT2(text=["Do you need to see it all to know your thoughts? Part 2"]),
-    #             ],
-    #         )
-    #     )
-    #     self.tags.add(
-    #         CHAP(
-    #             element_id="chp3",
-    #             start_time=1156000, end_time=1658000,
-    #             sub_frames=[
-    #                 TIT2(text=["Opossum Saved"]),
-    #             ],
-    #         )
-    #     )
-    #     self.tags.add(
-    #         CHAP(
-    #             element_id="chp4",
-    #             start_time=1658000, end_time=2325000,
-    #             sub_frames=[
-    #                 TIT2(text=["Corridor Gets Hacked"]),
-    #             ],
-    #         )
-    #     )
-    #     self.tags.add(
-    #         CHAP(
-    #             element_id="chp5",
-    #             start_time=2325000, end_time=3339000,
-    #             sub_frames=[
-    #                 TIT2(text=["Mark Rober's Scam Call Investigation"]),
-    #             ],
-    #         )
-    #     )
-    #     self.tags.add(
-    #         CHAP(
-    #             element_id="chp6",
-    #             start_time=3339000, end_time=3363000,
-    #             sub_frames=[
-    #                 TIT2(text=["Outro"]),
-    #             ],
-    #         )
-    #     )
-
 
 # use eyd3
 if __name__ == "__main__":
@@ -187,7 +119,7 @@ if __name__ == "__main__":
     from docs import Docs
 
     drive = Drive()
-    folder = drive.get_ep_folder_id('S1E1')
+    folder = drive.get_ep_folder_id('S1E2')
     print(f'{folder=}')
     details = drive.get_ep_details_id(folder)
     print(f'{details=}')
