@@ -1,9 +1,9 @@
 <p>{{ description }}</p>
-<p>Show Notes:</p>
+<!-- <p>Show Notes:</p> -->
 {% for shownote in shownotes %}
 <p><a href="{{ shownote.url }}" rel="ugc noopener noreferrer" target="_blank">{{ shownote.text }}</a></p>
 {% endfor %}
-<!-- <p><br /></p> -->
+<p><br /></p>
 <p>Chapters:</p>
 {% for text in chapters %}
 <p>{{ text }}</p>
