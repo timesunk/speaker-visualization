@@ -112,7 +112,7 @@ class Drive:
         raw = results.get('files', [])
 
         if not raw:
-            print(f"No raw folder in {self.folder['name']}.")
+            print(f"No raw folder in {folder['name']}.")
             return
 
         results = self.drive_service.files().list(

@@ -8,7 +8,7 @@ class Tag:
         self.metadata = metadata
         self.audio = audio
         self.audio_length = int(MUT_MP3(self.audio).info.length) * 1000
-
+        
         try:
             self.tags = ID3(self.audio, v2_version=3)
         except ID3NoHeaderError:
@@ -43,7 +43,7 @@ class Tag:
 
         if "(Movie Plug)" in title[0]:
 
-            with open(r"images\covart - movie_plug.jpg", "rb") as covart:
+            with open(r"assets\covart - movie_plug.jpg", "rb") as covart:
                 self.tags.add(
                     APIC(
                         encoding=3,        # 3 = UTF-8
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     from docs import Docs
 
     drive = Drive()
-    folder = drive.get_ep_folder_id('S1E2')
+    folder = drive.get_ep_folder_id('S1E17')
     print(f'{folder=}')
     details = drive.get_ep_details_id(folder)
     print(f'{details=}')

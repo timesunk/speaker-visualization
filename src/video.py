@@ -30,7 +30,6 @@ image_paths = {
 audio_clip = AudioFileClip(audio_path)
 audio_duration  = audio_clip.duration
 
-
 all_times = {0,audio_duration}
 for start, end in a_speaking + h_speaking:
     all_times.update([start, end])
@@ -45,27 +44,17 @@ hi = 0
 a_len = len(a_speaking)
 h_len = len(h_speaking)
 
-# with open('debug.txt','w') as fw:
 
 for t0, t1 in zip(times, times[1:]):
 
-    # fw.write(f'\n\n----------------- {t0} - {t1} -------------------------\n')
-    # fw.write(f' a: {a_speaking[ai]} - h: {h_speaking[hi]} \n')
-
     while ai < a_len and a_speaking[ai][1] == t0:
         ai += 1
-        # fw.write(f' ai: {ai}\n')
-
 
     while hi < h_len and h_speaking[hi][1] == t0:
         hi += 1
-        # fw.write(f' hi: {hi}\n')
-
 
     a_on = (ai < a_len and a_speaking[ai][0] == t0)
     h_on = (hi < h_len and h_speaking[hi][0] == t0)
-
-    # fw.write(f' a_on: {a_on} | h_on: {h_on}\n')
 
     if a_on and h_on:
         img = image_paths["both"]
@@ -85,7 +74,7 @@ with open(concat_file, "w") as f:
         img_path = Path(img).resolve().as_posix()  # forward slashes for Windows
         f.write(f"file '{img_path}'\n")
         f.write(f"duration {dur}\n")
-    # Repeat last image to cover audio fully
+    # Repeat last image to cover audio fully, needed?
     last_img_path = Path(intervals[-1][0]).resolve().as_posix()
     f.write(f"file '{last_img_path}'\n")
 
