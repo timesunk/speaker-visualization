@@ -1,4 +1,5 @@
 from pprint import pprint
+from jinja2 import Environment, FileSystemLoader
 from mutagen.id3 import ID3, CTOC, CHAP, TIT2, CTOCFlags, ID3NoHeaderError, TPE1, TRCK, APIC
 from mutagen.mp3 import MP3 as MUT_MP3
 
@@ -111,6 +112,29 @@ class Tag:
                     ],
                 )
             )
+    
+    def create_description(self):
+        """
+        Create HTML description for episode
+        """
+        description = self.metadata["Description"][0]
+        shownotes = self.metadata["Shownotes"]
+        raw_chapters = self.metadata["Chapters"]
+        chapters = []
+        for chapter in raw_chapters:
+            timestamp, title = chapter.split(" ", 1)
+            chapters.append(f"({timestamp}) {title}")
+        
+        env = Environment(loader=FileSystemLoader("templates"),
+                          trim_blocks=True,
+                          lstrip_blocks=True)
+
+        template = env.get_template("description_template.html")
+
+        output = template.render(description=description, shownotes=shownotes, chapters=chapters)
+
+        with open("description.html", "w", encoding="utf-8") as f:
+            f.write(output)
 
 
 # use eyd3
@@ -119,7 +143,7 @@ if __name__ == "__main__":
     from docs import Docs
 
     drive = Drive()
-    folder = drive.get_ep_folder_id('S1E17')
+    folder = drive.get_ep_folder_id('S1E19')
     print(f'{folder=}')
     details = drive.get_ep_details_id(folder)
     print(f'{details=}')
@@ -135,3 +159,4 @@ if __name__ == "__main__":
     mp3.delete_tags()
     mp3.add_tags()
     mp3.print_tags()
+    mp3.create_description()
