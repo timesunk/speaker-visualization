@@ -7,6 +7,9 @@ credentials.json
 *.mp3
 *.mp4
 
+#descriptions
+description.html
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
