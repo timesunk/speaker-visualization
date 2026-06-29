@@ -142,8 +142,10 @@ if __name__ == "__main__":
     from drive import Drive
     from docs import Docs
 
+    episode = "S1E29"
+
     drive = Drive()
-    folder = drive.get_ep_folder_id('S1E19')
+    folder = drive.get_ep_folder_id(episode)
     print(f'{folder=}')
     details = drive.get_ep_details_id(folder)
     print(f'{details=}')
@@ -160,3 +162,8 @@ if __name__ == "__main__":
     mp3.add_tags()
     mp3.print_tags()
     mp3.create_description()
+
+    print("UPLOADING, it doesn't print anything in the process")
+    uploaded = drive.upload_mp3(folder, episode)
+    pprint(uploaded)
+

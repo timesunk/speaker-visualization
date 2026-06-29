@@ -30,7 +30,7 @@ class Docs:
         """
 
         # If modifying these scopes, delete the file token_drive.json.
-        SCOPES = ["https://www.googleapis.com/auth/documents.readonly"]
+        SCOPES = ["https://www.googleapis.com/auth/documents"]
 
         creds = None
         if os.path.exists("token_docs.json"):

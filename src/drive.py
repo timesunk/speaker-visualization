@@ -7,6 +7,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaFileUpload
 
 import logging
 
@@ -29,7 +30,7 @@ class Drive:
         """
 
         # If modifying these scopes, delete the file token_drive.json.
-        SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
+        SCOPES = ['https://www.googleapis.com/auth/drive']
 
         creds = None
         if os.path.exists('token_drive.json'):
@@ -145,6 +146,66 @@ class Drive:
             f.write(file.getbuffer())
         
         return mp3
+    
+    def upload_mp3(self, folder:dict, episode: str):
+        """
+        Uploads an mp3 file to `ep_folder/final/` on Google Drive.
+
+        Args:
+            folder (dict): name and id of episode folder
+            episode (str): name of episode
+
+        Returns:
+            dict: metadata of the uploaded file
+        """
+        results = self.drive_service.files().list(
+            pageSize=1, 
+            fields="files(id, name)",
+            q=f"'{folder['id']}' in parents and name='final' and mimeType = 'application/vnd.google-apps.folder' and trashed=false"
+        ).execute()
+        final_folders = results.get('files', [])
+
+        # In case the final folder doesn't exist somehow
+        if not final_folders:
+            print(f"No 'final' folder found in {folder['name']}. Creating one...")
+            folder_metadata = {
+                'name': 'final',
+                'mimeType': 'application/vnd.google-apps.folder',
+                'parents': [folder['id']]
+            }
+            final_folder = self.drive_service.files().create(
+                body=folder_metadata, 
+                fields='id'
+            ).execute()
+            final_folder_id = final_folder.get('id')
+        else:
+            final_folder_id = final_folders[0]['id']
+        
+        file_metadata = {
+            'name': f"{folder['name']}.mp3",
+            'parents': [final_folder_id]
+        }
+
+        media = MediaFileUpload(
+            f"./{episode}.mp3", 
+            mimetype='audio/mp3', 
+            resumable=True
+        )
+
+        try:
+            print(f"Uploading {file_metadata['name']} to Drive...")
+            uploaded_file = self.drive_service.files().create(
+                body=file_metadata,
+                media_body=media,
+                fields='id, name'
+            ).execute()
+            
+            print(f"Successfully uploaded: {uploaded_file.get('name')} (ID: {uploaded_file.get('id')})")
+            return uploaded_file
+
+        except HttpError as error:
+            print(f'An error occurred during upload: {error}')
+            return None
 
 if __name__ == '__main__':
     drive = Drive()
