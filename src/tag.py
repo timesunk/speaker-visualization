@@ -44,7 +44,7 @@ class Tag:
 
         if "(Movie Plug)" in title[0]:
 
-            with open(r"assets\covart - movie_plug.jpg", "rb") as covart:
+            with open(r"images\covart - movie_plug.jpg", "rb") as covart:
                 self.tags.add(
                     APIC(
                         encoding=3,        # 3 = UTF-8
@@ -54,6 +54,18 @@ class Tag:
                         data=covart.read()
                     )
             )
+        else:
+            with open(r"images\covart.jpg", "rb") as covart:
+                self.tags.add(
+                    APIC(
+                        encoding=3,        # 3 = UTF-8
+                        mime="image/jpeg", # or "image/png"
+                        type=3,            # 3 = front cover
+                        desc="Cover",
+                        data=covart.read()
+                    )
+            )
+
 
     def delete_tags(self):
         """
