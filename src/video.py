@@ -4,27 +4,28 @@ from pathlib import Path
 from moviepy import AudioFileClip
 
 # --- Paths ---
-audio_path = r"C:\Users\Hamza\Desktop\podcast\edit\S1E2\S1E2.mp3"
-output_path = r"C:\Users\Hamza\Desktop\podcast\edit\S1E2\S1E2.mp4"
+audio_path = r"/Users/hamza/Desktop/S1E29.mp3"
+output_path = r"/Users/hamza/Desktop/S1E29.mp4"
 
 a_speaking = []
 h_speaking = []
 
-with open(r"C:\Users\Hamza\Desktop\podcast\edit\S1E2\a.txt", 'r') as f:
+with open(r"/Users/hamza/Desktop/a.txt", 'r') as f:
     for line in f:
         tokens = line.split()
+        # print(tokens)
         a_speaking.append((float(tokens[0]), float(tokens[1])))
 
-with open(r"C:\Users\Hamza\Desktop\podcast\edit\S1E2\h.txt", 'r') as f:
+with open(r"/Users/hamza/Desktop/h.txt", 'r') as f:
     for line in f:
         tokens = line.split()
         h_speaking.append((float(tokens[0]), float(tokens[1])))
 
 image_paths = {
-    "both": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\assets\merged\a line\both.png",
-    "a_only": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\assets\merged\a line\a.png",
-    "h_only": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\assets\merged\a line\h.png",
-    "none": r"C:\Users\Hamza\Desktop\podcast\codes\speaker-visualization\assets\merged\a line\none.png"
+    "both": r"assets/merged/a line/both.png",
+    "a_only": r"assets/merged/a line/a.png",
+    "h_only": r"assets/merged/a line/h.png",
+    "none": r"/Users/hamza/codes/speaker-visualization/assets/merged/a line/none.png"
 }
 
 audio_clip = AudioFileClip(audio_path)

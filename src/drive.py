@@ -150,6 +150,8 @@ class Drive:
     def upload_mp3(self, folder:dict, episode: str):
         """
         Uploads an mp3 file to `ep_folder/final/` on Google Drive.
+        CHECK IF MULTIPLE UPLOADS
+        DEFAULT SHOULD BE DUPLICATE
 
         Args:
             folder (dict): name and id of episode folder

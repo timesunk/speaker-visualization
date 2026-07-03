@@ -44,7 +44,7 @@ class Tag:
 
         if "(Movie Plug)" in title[0]:
 
-            with open(r"images\covart - movie_plug.jpg", "rb") as covart:
+            with open(r"assets/images/covart - movie_plug.jpg", "rb") as covart:
                 self.tags.add(
                     APIC(
                         encoding=3,        # 3 = UTF-8
@@ -55,7 +55,7 @@ class Tag:
                     )
             )
         else:
-            with open(r"images\covart.jpg", "rb") as covart:
+            with open(r"assets/images/covart.jpg", "rb") as covart:
                 self.tags.add(
                     APIC(
                         encoding=3,        # 3 = UTF-8
@@ -137,7 +137,7 @@ class Tag:
             timestamp, title = chapter.split(" ", 1)
             chapters.append(f"({timestamp}) {title}")
         
-        env = Environment(loader=FileSystemLoader("templates"),
+        env = Environment(loader=FileSystemLoader("src/templates"),
                           trim_blocks=True,
                           lstrip_blocks=True)
 
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     from drive import Drive
     from docs import Docs
 
-    episode = "S1E29"
+    episode = "S1E31"
 
     drive = Drive()
     folder = drive.get_ep_folder_id(episode)
