@@ -87,7 +87,7 @@ class Docs:
 
 
         elements = doc["body"]["content"]
-        pprint(elements)
+        # pprint(elements)
         d = defaultdict(list)
         for value in elements:
             if "table" in value:
