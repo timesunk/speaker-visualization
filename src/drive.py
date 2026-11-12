@@ -185,12 +185,13 @@ class Drive:
         
         file_metadata = {
             'name': f"{folder['name']}.mp3",
-            'parents': [final_folder_id]
+            'parents': [final_folder_id],
+            'mimeType': 'audio/mpeg'
         }
 
         media = MediaFileUpload(
             f"./{episode}.mp3", 
-            mimetype='audio/mp3', 
+            mimetype='audio/mpeg',
             resumable=True
         )
 

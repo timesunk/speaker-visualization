@@ -1,0 +1,2 @@
+description.html didn't work properly, some kind of corrupted character for S1E35 Movie Plug
+If there's a newline in the Description of the details page, only the first paragraph is taken, the rest are ignored.
